@@ -17,8 +17,6 @@ interface UserFile {
 
 type Language = 'python' | 'javascript';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-
 export const Terminal: React.FC<TerminalProps> = ({ username, onLogout }) => {
   const [output, setOutput] = useState<string>('');
   const [input, setInput] = useState<string>('');
@@ -66,12 +64,7 @@ export const Terminal: React.FC<TerminalProps> = ({ username, onLogout }) => {
 
   useEffect(() => {
     // Connect to WebSocket
-    socketRef.current = io(BACKEND_URL, {
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
-      transports: ['websocket']
-    });
+    socketRef.current = io('http://localhost:3000');
 
     // Listen for installation output
     socketRef.current.on(`installation-${username}`, (data: string) => {

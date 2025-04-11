@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  console.log('Environment variables loaded:', {
+  console.log('local variables loaded:', {
     supabaseUrl: process.env.VITE_SUPABASE_URL ? 'Set' : 'Not set',
     supabaseKey: process.env.VITE_SUPABASE_ANON_KEY ? 'Set' : 'Not set'
   });

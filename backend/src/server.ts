@@ -5,30 +5,16 @@ import Docker from 'dockerode';
 import cors from 'cors';
 import { getUser, authenticateUser, updateUserContainer } from './services/supabase';
 import { User } from './types/user';
-import path from 'path';
 
 export const app = express();
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.VITE_FRONTEND_URL 
-    : 'http://localhost:5173',
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
-
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../dist')));
-}
 
 export const httpServer = createServer(app);
 export const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? process.env.VITE_FRONTEND_URL 
-      : 'http://localhost:5173',
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"]
   }
 });
 
