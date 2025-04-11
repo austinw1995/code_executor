@@ -29,38 +29,62 @@ A web-based code execution platform that allows users to write, save, and run Py
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/code_executor.git
+   git clone https://github.com/austinw1995/code_executor.git
    cd code_executor
    ```
 
-2. Install dependencies:
+2. Frontend Setup:
    ```bash
-   npm install
-   ```
+   # Navigate to frontend directory
+   cd frontend
 
-3. Create a `.env` file in the root directory with the following variables:
+   # Install dependencies
+   npm install
+
+   # Start development server
+   npm run dev
+   ```
+   The frontend will be available at `http://localhost:5173`
+
+3. Backend Setup:
+   ```bash
+   # Open a new terminal
+   # Navigate to backend directory
+   cd backend
+
+   # Install dependencies
+   npm install
+
+   # Start development server
+   npm run dev
+   ```
+   The backend will be available at `http://localhost:3000`
+
+4. Environment Setup:
+   Create a `.env` file in the root directory with the following variables:
    ```env
    SUPABASE_URL=your_supabase_url
    SUPABASE_KEY=your_supabase_key
    ```
 
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-## Environment Setup
+## Requirements
 
 The application requires:
 - Node.js 18+ 
 - Docker for container management
 - A Supabase account for backend services
 
-## Development
+## Development Commands
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
+Frontend (`/frontend` directory):
+- `npm run dev` - Start frontend development server
+- `npm run build` - Build frontend for production
+- `npm run preview` - Preview frontend production build
+
+Backend (`/backend` directory):
+- `npm run dev` - Start backend development server
+- `npm run build` - Build backend for production
+- `npm start` - Start backend production server
 
 ## Security
 
