@@ -69,14 +69,14 @@ async function getData() {
 
 ### Architecture Overview
 - Your code runs in secure Docker containers on our cloud infrastructure
-- Each user gets their own isolated environment
+- Each user gets their own isolated environment/Docker container
 - Files and settings persist between sessions
 - Real-time communication for instant feedback
 
 ### Security Features
 - Master password protection for application access
 - Individual user accounts
-- Isolated containers for each user
+- Isolated Docker containers for each user
 - Secure WebSocket connections
 - Regular security audits
 
