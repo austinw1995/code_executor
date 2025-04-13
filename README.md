@@ -78,7 +78,6 @@ async function getData() {
 - Individual user accounts
 - Isolated Docker containers for each user
 - Secure WebSocket connections
-- Regular security audits
 
 ## For Administrators
 
