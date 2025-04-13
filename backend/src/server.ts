@@ -5,6 +5,12 @@ import Docker from 'dockerode';
 import cors from 'cors';
 import { getUser, authenticateUser, updateUserContainer } from './services/supabase';
 import { User } from './types/user';
+import fs from 'fs';
+import path from 'path';
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export const app = express();
 app.use(cors());
@@ -18,7 +24,14 @@ export const io = new Server(httpServer, {
   }
 });
 
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+const docker = new Docker({
+  host: 'ec2-3-92-233-220.compute-1.amazonaws.com',
+  port: 2376,
+  ca: Buffer.from(process.env.DOCKER_CA || '', 'base64'),
+  cert: Buffer.from(process.env.DOCKER_CERT || '', 'base64'),
+  key: Buffer.from(process.env.DOCKER_KEY || '', 'base64'),
+  protocol: 'https'
+});
 
 // List of shells to try in order
 const SHELL_COMMANDS = ['/bin/sh', '/bin/bash', '/bin/ash'];

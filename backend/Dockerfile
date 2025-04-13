@@ -1,27 +1,31 @@
-FROM ubuntu:latest
+FROM node:18
 
-# Avoid prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Update and install basic tools
+# Install Docker CLI
 RUN apt-get update && apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
     curl \
-    wget \
-    git \
-    python3 \
-    python3-pip \
+    gnupg \
+    lsb-release \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian bullseye stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-# Set default answers for tzdata configuration
-RUN echo "1" | apt-get update && echo "150" | apt-get install -y tzdata
+# Copy package files
+COPY package*.json ./
 
-# Set working directory
-WORKDIR /root
+# Install dependencies
+RUN npm install
 
-# Set default command
-CMD ["/bin/bash"] 
+# Copy project files
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"] 
