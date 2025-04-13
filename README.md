@@ -14,11 +14,117 @@ Code Executor provides:
 
 ## Getting Started
 
-### Quick Start
-1. Visit the application URL
-2. Enter the master password (get this from your administrator)
-3. Create an account or log in
-4. Start coding!
+### Prerequisites
+- Node.js v18 or higher
+- Git
+- AWS EC2 instance with Docker configured (see Docker Setup section below)
+- Supabase account and project
+
+### Setup Instructions
+
+1. **Clone and Setup Frontend**
+   ```bash
+   # Clone the repository
+   git clone [your-repo-url]
+   cd code_executor
+
+   # Install frontend dependencies
+   npm install
+
+   # Copy environment file
+   cp .env.example .env
+   ```
+
+2. **Setup Backend**
+   ```bash
+   # Navigate to backend directory
+   cd backend
+
+   # Install backend dependencies
+   npm install
+   ```
+
+3. **Configure Environment Variables**
+   
+   Create a `.env` file in the root directory with the following configuration:
+
+   ```env
+   # Supabase Configuration
+   # Get these from your Supabase project settings -> API
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+   # Docker Configuration
+   # Format: tcp://your-ec2-instance:2376
+   DOCKER_HOST=your_docker_host
+
+   # TLS Certificates (base64 encoded)
+   # Generate these using the instructions in the Docker Setup section
+   DOCKER_CA=your_base64_encoded_ca_cert
+   DOCKER_CERT=your_base64_encoded_client_cert
+   DOCKER_KEY=your_base64_encoded_client_key
+
+   # Application Security
+   # Choose a secure master password for initial access
+   VITE_MASTER_PASSWORD=your_master_password
+   ```
+
+4. **Start Development Servers**
+
+   In the root directory (frontend):
+   ```bash
+   npm run dev
+   ```
+
+   In a new terminal, navigate to the backend directory:
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+### Environment Configuration Guide
+
+1. **Supabase Setup**
+   - Create a new project at [Supabase](https://supabase.com)
+   - Go to Project Settings -> API
+   - Copy the `Project URL` as `VITE_SUPABASE_URL`
+   - Copy the `anon/public` key as `VITE_SUPABASE_ANON_KEY`
+   - See Supabase Setup section
+
+2. **Docker Configuration**
+   - Set up your EC2 instance following the Docker Setup section below
+   - Your `DOCKER_HOST` should be in the format `tcp://your-ec2-instance:2376`
+   - Generate TLS certificates (see Docker Setup section)
+   - Base64 encode your certificates:
+     ```bash
+     # On macOS/Linux
+     base64 -i ca.pem > ca.base64
+     base64 -i cert.pem > cert.base64
+     base64 -i key.pem > key.base64
+     ```
+   - Copy the encoded contents to the respective environment variables
+
+3. **Master Password**
+   - Choose a secure master password
+   - This will be required for initial access to the application
+   - Store it in `VITE_MASTER_PASSWORD`
+
+### Verifying the Setup
+
+1. Frontend should be running at `http://localhost:5173`
+2. Backend should be running at `http://localhost:3000`
+3. You should be able to:
+   - Access the login page
+   - Enter the master password
+   - Create a new account
+   - Connect to a Docker container
+   - Execute code
+
+If you encounter any issues, check:
+- Both frontend and backend servers are running
+- All environment variables are properly set
+- Docker daemon is accessible
+- Supabase project is properly configured
 
 ### What You Can Do
 - **Write and Run Code**
