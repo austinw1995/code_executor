@@ -1,302 +1,119 @@
 # Code Executor
 
-A secure, web-based code execution environment that allows users to run code in isolated Docker containers. This project provides a browser-based terminal interface with real-time code execution capabilities, featuring a modern code editor and persistent file storage.
+A secure, web-based code execution environment that lets you write and run code directly in your browser. No local setup needed - just log in and start coding!
 
-## Features
+## What is Code Executor?
 
-- 🔒 Secure code execution in isolated Docker containers
-- 💻 Browser-based terminal interface with ANSI color support
-- 🚀 Real-time code execution for Python and JavaScript
-- 👥 Multi-level authentication (Master password + User accounts)
-- 📝 Monaco code editor integration with syntax highlighting
-- 💾 Persistent file storage with Supabase backend
-- 🔄 WebSocket-based real-time communication
-- 📦 Automatic container provisioning for each user
-- 🔍 File management system (create, save, load, delete)
-- 🎨 Modern UI with Tailwind CSS
-
-## Tech Stack
-
-- **Frontend:**
-  - React 18 with TypeScript
-  - Vite for fast development and building
-  - Monaco Editor for code editing
-  - XTerm.js for terminal emulation
-  - TailwindCSS for styling
-  - Socket.io Client for real-time communication
-  - React Router for navigation
-
-- **Backend:**
-  - Node.js with Express
-  - Docker API (remote connection)
-  - Socket.io for real-time communication
-  - Supabase for:
-    - User authentication
-    - File storage
-    - Container management
-
-## System Architecture
-
-### Overview
-- Frontend runs locally on your machine
-- Backend connects to a remote Docker daemon running on an EC2 instance
-- Code execution happens in isolated Docker containers on the EC2 instance
-- No local Docker installation is required for development
-- File storage and user authentication handled by Supabase
-- Real-time communication via WebSocket connections
-
-### Security Architecture
-
-1. **Master Password Protection (GateKeeper)**
-   - Initial security layer requiring a master password
-   - Prevents unauthorized access to the login/registration system
-   - Configured via `VITE_MASTER_PASSWORD` environment variable
-   - Must be entered before accessing any application features
-
-2. **User Authentication**
-   - Individual user accounts with username/password
-   - Secure container association per user
-   - Persistent storage of user files and preferences
-
-3. **Container Isolation**
-   - Each user gets their own isolated Ubuntu container
-   - Containers are automatically provisioned on registration
-   - Resource limits and security constraints applied
-   - Clean environment for each session
-
-### Why Docker?
-
-Docker is used in this project to:
-1. Provide isolated environments for each user's code execution
-2. Ensure security by containerizing untrusted code
-3. Manage resource allocation and limits
-4. Enable clean environment for each session
-5. Support multiple programming languages and dependencies
+Code Executor provides:
+- 🚀 Instant Python and JavaScript coding environment in your browser
+- 💻 Full-featured terminal with color support
+- 📝 Modern code editor with syntax highlighting
+- 💾 Automatic file saving and version tracking
+- 🔒 Secure, isolated environment for each user
+- 📦 Easy package installation (pip and npm supported)
 
 ## Getting Started
 
-### Prerequisites
+### Quick Start
+1. Visit the application URL
+2. Enter the master password (get this from your administrator)
+3. Create an account or log in
+4. Start coding!
 
-- Node.js (v18 or higher)
+### What You Can Do
+- **Write and Run Code**
+  - Python 3 with popular data science packages
+  - Node.js with npm support
+  - Real-time code execution
+  - Full terminal access
+
+- **Manage Files**
+  - Create and edit files
+  - Automatic file saving
+  - File version history
+  - Easy file organization
+
+- **Install Packages**
+  - Use pip for Python packages
+  - Use npm for JavaScript packages
+  - Packages persist between sessions
+  - Access to full package registries
+
+### Example Usage
+
+**Python:**
+```python
+# Install and use packages
+pip install requests
+import requests
+
+# Your code runs in an isolated environment
+response = requests.get('https://api.example.com/data')
+print(response.json())
+```
+
+**JavaScript:**
+```javascript
+// Install and use npm packages
+npm install axios
+const axios = require('axios');
+
+// Full Node.js environment
+async function getData() {
+    const response = await axios.get('https://api.example.com/data');
+    console.log(response.data);
+}
+```
+
+## How It Works
+
+### Architecture Overview
+- Your code runs in secure Docker containers on our cloud infrastructure
+- Each user gets their own isolated environment
+- Files and settings persist between sessions
+- Real-time communication for instant feedback
+
+### Security Features
+- Master password protection for application access
+- Individual user accounts
+- Isolated containers for each user
+- Secure WebSocket connections
+- Regular security audits
+
+## For Administrators
+
+### System Requirements
+- Node.js v18 or higher
 - Git
+- AWS EC2 instance for Docker containers
+- Supabase account for data storage
 
-Note: Docker is NOT required locally as the application connects to a remote Docker daemon.
+### Setup Instructions
 
-### Environment Setup
-
-1. Clone the repository:
-```bash
-git clone [your-repo-url]
-cd code_executor
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Create environment file:
-```bash
-cp .env.example .env
-```
-
-4. Configure your `.env` file with the following variables:
-```env
-# Supabase Configuration
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-# Remote Docker Configuration (provided by administrator)
-DOCKER_HOST=tcp://your-ec2-instance:2376  # Your EC2 instance public DNS/IP
-DOCKER_CA=base64_encoded_ca_certificate
-DOCKER_CERT=base64_encoded_client_certificate
-DOCKER_KEY=base64_encoded_client_key
-
-# Application Security
-VITE_MASTER_PASSWORD=your_master_password  # Required for initial access
-
-# Optional Configuration
-PORT=3000  # Backend server port
-```
-
-### Development
-
-To run the project in development mode:
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`
-
-## Core Functionality
-
-1. **Master Password Check**
-   - Before creating an account, users must enter the master password
-   - This acts as a gatekeeper to prevent unauthorized access
-   - The master password is set by the administrator in the environment variables
-   - Only after entering the correct master password can users proceed to registration
-
-2. **Registration Steps**
-   - After passing the master password check, users can create their account:
-     1. Enter desired username and password
-     2. System checks if username is available
-     3. If available, creates account in Supabase
-     4. Automatically provisions a dedicated Docker container
-     5. Sets up Python and Node.js environments in the container
-     6. Creates necessary file storage space
-
-3. **Behind the Scenes**
-   - When a user registers:
-     ```typescript
-     // 1. Master password verification
-     if (enteredPassword === MASTER_PASSWORD) {
-       // Allow access to registration
-     }
-
-     // 2. Account creation in database
-     const newUser = {
-       username: enteredUsername,
-       password: hashedPassword,  // Password is hashed before storage
-       container_id: `user-${username}-container`
-     };
-
-     // 3. Container provisioning
-     const container = await createContainer({
-       name: newUser.container_id,
-       image: 'ubuntu:latest',
-       // ... container configuration
-     });
-
-     // 4. Environment setup
-     await setupUserEnvironment(container);
-     ```
-
-#### Login Process
-
-1. **User Login Flow**
-   - Enter username and password
-   - System verifies credentials against Supabase database
-   - If valid, establishes connection to user's container
-   - Restores previous session state and files
-
-2. **Technical Process**
-   ```typescript
-   // 1. Credential verification
-   const user = await verifyCredentials(username, password);
-   if (user) {
-     // 2. Container reconnection
-     const container = await getContainer(user.container_id);
-     
-     // 3. Session restoration
-     await restoreSession(container);
-     
-     // 4. File system mounting
-     await mountUserFiles(username);
-   }
+1. **Environment Configuration**
+   ```bash
+   # Clone and setup
+   git clone [your-repo-url]
+   cd code_executor
+   npm install
+   cp .env.example .env
    ```
 
-3. **Session Management**
-   - Automatic reconnection to existing container
-   - Persistent storage of user files and settings
-   - Secure WebSocket connection for real-time terminal access
-   - Automatic session timeout for security
-
-4. **Security Features**
-   - Passwords are hashed and salted
-   - Rate limiting on login attempts
-   - Session tokens for persistent authentication
-   - Automatic container isolation
-   - Regular security audits
-
-### Container Management
-
-1. **Container Creation Process**
-   ```typescript
-   const container = await docker.createContainer({
-     Image: 'ubuntu:latest',
-     AttachStdin: true,
-     AttachStdout: true,
-     AttachStderr: true,
-     Tty: true,
-     OpenStdin: true,
-     StdinOnce: false,
-     Cmd: ["/bin/bash"],
-     name: containerName,
-     Env: ['DEBIAN_FRONTEND=noninteractive'],
-     HostConfig: {
-       NetworkMode: 'host'
-     }
-   });
+2. **Configure Environment Variables**
+   ```env
+   # Required configuration
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   DOCKER_HOST=tcp://your-ec2-instance:2376
+   VITE_MASTER_PASSWORD=your_master_password
    ```
 
-2. **Shell Management**
-   - Multiple shell fallbacks (bash, sh, ash)
-   - Automatic virtual environment activation
-   - Persistent shell sessions between connections
-
-3. **Resource Management**
-   - Network access for package installation
-   - Volume persistence
-   - Container state preservation
-
-### Code Execution Environment
-
-1. **Python Environment**
-   - Python 3 with virtual environment
-   - Pre-installed packages:
-     - pandas for data manipulation
-     - scipy for scientific computing
-   - Dynamic package installation:
-     ```python
-     # Users can install additional packages
-     pip install package_name
-     
-     # Example: Installing and using new packages
-     pip install requests
-     import requests
-     ```
-   - Access to pip for additional package installation
-   - All pip installations persist in the user's container
-
-2. **JavaScript Environment**
-   - Node.js runtime with npm
-   - Package installation capabilities:
-     ```javascript
-     // Install packages using npm
-     npm install package_name
-     
-     // Example: Installing and using Express
-     npm install express
-     const express = require('express');
-     ```
-   - Full access to npm registry
-   - Persistent node_modules in user's container
-
-### File Management System
-
-1. **Database Schema**
-   ```typescript
-   // File structure in Supabase
-   interface CodeFile {
-     username: string;
-     file_name: string;
-     code_content: string;
-     last_saved: string;
-   }
+3. **Start Development Server**
+   ```bash
+   npm run dev
    ```
 
-2. **Features**
-   - Create and edit files
-   - Automatic language detection
-   - File renaming and deletion
-   - Version tracking
-   - Secure file access
-   - Persistent storage
-   - Real-time editing
-   - Auto-save support
-
-## Technical Implementation
+## Technical Details
 
 ### Project Structure
 
@@ -345,50 +162,38 @@ code_executor/
 
 ### WebSocket Communication
 
-```typescript
-// Frontend socket connection
-const socket = io('http://localhost:3000', {
-  reconnectionDelay: 1000,
-  reconnection: true,
-  reconnectionAttempts: 10,
-  transports: ['websocket'],
-  agent: false,
-  upgrade: false,
-  rejectUnauthorized: false
-});
+The application uses WebSocket connections to enable real-time communication between the client and server, particularly for terminal interactions and container management.
 
-// Backend socket handling
-io.on('connection', (socket) => {
-  socket.on('terminal-input', (data) => {
-    // Handle terminal input
-  });
-  socket.on('terminal-output', (data) => {
-    // Stream output to client
-  });
-});
-```
+1. **Connection Setup**
+   ```typescript
+   // Frontend WebSocket initialization
+   const socket = io('http://localhost:3000', {
+     reconnectionDelay: 1000,
+     reconnection: true,
+     reconnectionAttempts: 10,
+     transports: ['websocket'],
+     agent: false,
+     upgrade: false,
+     rejectUnauthorized: false
+   });
 
-### API Endpoints
+   // Backend WebSocket handler
+   io.on('connection', (socket) => {
+     // Authentication handler
+     socket.on('authenticate', async (username) => {
+       const container = await getUserContainer(username);
+       setupTerminalConnection(socket, container);
+     });
 
-1. **Authentication Endpoints**
-   ```http
-   POST /api/register
-   Content-Type: application/json
-
-   {
-     "username": "string",
-     "password": "string"
-   }
-   ```
-
-   ```http
-   POST /api/login
-   Content-Type: application/json
-
-   {
-     "username": "string",
-     "password": "string"
-   }
+     // Terminal I/O handlers
+     socket.on('terminal-input', handleTerminalInput);
+     socket.on('terminal-output', handleTerminalOutput);
+     
+     // Container management handlers
+     socket.on('create-container', handleContainerCreation);
+     socket.on('attach-container', handleContainerAttachment);
+     socket.on('remove-container', handleContainerRemoval);
+   });
    ```
 
 2. **WebSocket Events**
@@ -408,6 +213,90 @@ io.on('connection', (socket) => {
      - `container-renamed`: Container rename confirmation
      - `container-removed`: Container deletion confirmation
      - `error`: Error notifications
+
+### File Management and Database Architecture
+
+This project uses Supabase as its backend service for user authentication, file storage, and container management. Here's how the data is organized and managed:
+
+1. **Database Schema**
+   ```sql
+   -- User Authentication and Container Management
+   CREATE TABLE login_creds (
+     username TEXT PRIMARY KEY,
+     password TEXT NOT NULL,
+     docker_container_id TEXT,
+     created_at TIMESTAMP DEFAULT NOW()
+   );
+
+   -- File Storage and Management
+   CREATE TABLE code_files (
+     id SERIAL PRIMARY KEY,
+     username TEXT REFERENCES login_creds(username),
+     file_name TEXT NOT NULL,
+     code_content TEXT,
+     last_saved TIMESTAMP DEFAULT NOW(),
+     UNIQUE(username, file_name)
+   );
+   ```
+
+2. **Data Management Flow**
+   - **User Data**:
+     - Secure password storage
+     - Container ID association
+     - Session tracking and management
+   
+   - **File Operations**:
+     - Automatic file versioning
+     - Real-time save and sync
+     - Conflict resolution
+     - Access control based on ownership
+
+3. **Supabase Integration**
+   ```typescript
+   // File operations example
+   const fileOperations = {
+     // Save file
+     async saveFile(username: string, fileName: string, content: string) {
+       return supabase
+         .from('code_files')
+         .upsert({ username, file_name: fileName, code_content: content });
+     },
+
+     // Load user files
+     async getUserFiles(username: string) {
+       return supabase
+         .from('code_files')
+         .select('*')
+         .eq('username', username);
+     },
+
+     // Delete file
+     async deleteFile(username: string, fileName: string) {
+       return supabase
+         .from('code_files')
+         .delete()
+         .match({ username, file_name: fileName });
+     }
+   };
+   ```
+
+4. **Features and Capabilities**
+   - **File Management**:
+     - Create, read, update, delete operations
+     - Automatic syntax highlighting
+     - File type detection
+     - Real-time collaboration support
+   
+   - **Storage Features**:
+     - Persistent file storage
+     - Automatic backup
+     - Version history
+     - Access control
+   
+   - **Security Measures**:
+     - User-based access control
+     - SQL injection prevention
+     - Input validation
 
 ## Deployment
 
@@ -504,84 +393,207 @@ io.on('connection', (socket) => {
    - Allow port 3000 for WebSocket
    - Allow port 80/443 for HTTP/HTTPS
 
-### Application Deployment
-
-1. **Backend Deployment**
-   ```bash
-   # Build backend
-   npm run build
-
-   # Start server
-   npm start
-   ```
-
-2. **Frontend Deployment**
-   ```bash
-   # Build frontend
-   npm run build
-
-   # Serve using nginx or similar
-   ```
-
 ### Supabase Setup
 
 1. Create new project
 2. Create required tables using provided schema
-3. Configure row level security (RLS)
+3. Disable row level security (RLS)
 4. Generate and save API keys
 
-## Best Practices
+## How It Works - Technical Deep Dive
 
-1. **Security**
-   - All container operations are isolated
-   - Master password protection
+This section provides a comprehensive explanation of the core processes in Code Executor.
+
+### Account Creation Process
+
+1. **Master Password Verification**
+   ```typescript
+   // GateKeeper.tsx
+   const MASTER_PASSWORD = import.meta.env.VITE_MASTER_PASSWORD;
+   if (password === MASTER_PASSWORD) {
+     onAccess(); // Grant access to registration
+   }
+   ```
+   - Initial security layer requiring administrator-set password
+   - Prevents unauthorized access to registration system
+
+2. **User Registration Flow**
+   ```typescript
+   // LoginPage.tsx
+   const handleSubmit = async (e: React.FormEvent) => {
+     // 1. Check if username exists
+     const exists = await checkUsernameExists(username);
+     
+     // 2. Create Supabase account
+     const containerName = `user-${username}-container`;
+     await createAccount({ username, password, docker_container_id: containerName });
+     
+     // 3. Initialize container
+     await fetch('http://localhost:3000/api/register', {
+       method: 'POST',
+       body: JSON.stringify({ username, password })
+     });
+   }
+   ```
+
+3. **Container Provisioning**
+   ```typescript
+   // server.ts
+   const INSTALL_SCRIPT = `
+     apt-get update && apt-get install -y
+     python3 python3-pip python3-venv
+     nodejs npm
+     python3 -m venv venv
+     . venv/bin/activate
+     pip install pandas scipy
+   `;
+
+   async function createUbuntuContainer(containerName: string) {
+     // 1. Pull Ubuntu image
+     await docker.pull('ubuntu:latest');
+     
+     // 2. Create container
+     const container = await docker.createContainer({
+       Image: 'ubuntu:latest',
+       name: containerName,
+       // ... configuration
+     });
+     
+     // 3. Install dependencies
+     await installDependencies(container);
+   }
+   ```
+   - Creates Ubuntu container with unique name
+   - Installs Python, Node.js, and essential packages
+   - Sets up Python virtual environment
+   - Configures persistent storage
+
+### Login Process
+
+1. **Credential Verification**
+   ```typescript
+   // LoginPage.tsx
+   const { exists, passwordMatch } = await checkLoginCredentials(username, password);
+   if (exists && passwordMatch) {
+     const response = await fetch('/api/login', {
+       method: 'POST',
+       body: JSON.stringify({ username, password })
+     });
+   }
+   ```
+
+2. **Container Connection**
+   ```typescript
+   // Terminal.tsx
+   useEffect(() => {
+     // 1. Connect to WebSocket
+     socketRef.current = io('http://localhost:3000');
+     
+     // 2. Authenticate and connect to container
+     socketRef.current.emit('authenticate', username);
+     
+     // 3. Handle terminal I/O
+     socketRef.current.on('terminal-output', (data) => {
+       setOutput(prev => prev + data);
+     });
+   }, [username]);
+   ```
+   - Retrieves user's container ID from Supabase
+   - Establishes WebSocket connection
+   - Connects to user's persistent container
+   - Restores previous session state
+
+### File Management System
+
+1. **File Operations**
+   ```typescript
+   // supabase.ts
+   export const saveCodeFile = async (
+     username: string,
+     fileName: string,
+     codeContent: string
+   ) => {
+     // Save/update file in Supabase
+     await supabase
+       .from('code_files')
+       .upsert({
+         username,
+         file_name: fileName,
+         code_content: codeContent
+       });
+   };
+   ```
+   - Files stored in Supabase with user association
+   - Automatic version tracking
+   - Real-time save and sync
+   - Language-specific handling
+
+2. **Code Execution**
+   ```typescript
+   // Terminal.tsx
+   const handleRun = () => {
+     // Execute based on file type
+     const script = selectedLanguage === 'python'
+       ? `python3 -c "${editorContent}"`
+       : `node -e "${editorContent}"`;
+     
+     // Send to container via WebSocket
+     socketRef.current?.emit('terminal-input', script + '\n');
+   };
+   ```
+   - Direct execution in user's container
+   - Language-specific runtime selection
+   - Real-time output streaming
+   - Error handling and display
+
+### EC2 Container Architecture
+
+The decision to host Docker containers on EC2 provides several critical advantages:
+
+1. **Resource Management**
+   - Centralized container orchestration
+   - Efficient resource allocation
+   - Automated scaling capabilities
+   - Consistent environment for all users
+
+2. **Security Benefits**
+   ```typescript
+   // server.ts
+   const docker = new Docker({
+     host: process.env.DOCKER_HOST,
+     port: 2376,
+     ca: Buffer.from(process.env.DOCKER_CA || '', 'base64'),
+     cert: Buffer.from(process.env.DOCKER_CERT || '', 'base64'),
+     key: Buffer.from(process.env.DOCKER_KEY || '', 'base64'),
+     protocol: 'https'
+   });
+   ```
    - TLS encryption for Docker communication
+   - Isolated container environments
+   - Network access control
    - Secure WebSocket connections
-   - Input validation and sanitization
 
-2. **Performance**
-   - Lazy loading of containers
-   - Efficient WebSocket communication
-   - Resource cleanup on disconnection
-   - Automatic container management
+3. **Performance Optimization**
+   - Load distribution across instances
+   - Resource pooling
+   - Efficient container management
+   - Quick startup and response times
 
-3. **Error Handling**
-   - Graceful error recovery
-   - Detailed error messages
-   - Automatic reconnection
-   - Session persistence
+4. **Cost Efficiency**
+   - Pay-per-use pricing
+   - Resource sharing across users
+   - Optimized infrastructure utilization
+   - Scalable deployment model
 
-## Troubleshooting
-
-Common issues and solutions:
-
-1. **Container Connection Issues**
-   - Verify Docker daemon configuration
-   - Check TLS certificates
-   - Ensure proper network access
-
-2. **WebSocket Connection Errors**
-   - Check port accessibility
-   - Verify CORS configuration
-   - Confirm WebSocket protocol
-
-3. **Package Installation Failures**
-   - Verify network access in container
-   - Check package repository access
-   - Confirm sufficient disk space
-
-4. **Performance Issues**
-   - Monitor container resource usage
-   - Check network latency
-   - Optimize code execution
+This architecture enables a secure, scalable, and efficient code execution environment while maintaining isolation between users and providing a seamless development experience.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+   This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+   ## Acknowledgments
 
-- [Monaco Editor](https://microsoft.github.io/monaco-editor/)
-- [XTerm.js](https://xtermjs.org/)
-- [Docker](https://www.docker.com/)
-- [Supabase](https://supabase.com/)
+   - [Monaco Editor](https://microsoft.github.io/monaco-editor/)
+   - [XTerm.js](https://xtermjs.org/)
+   - [Docker](https://www.docker.com/)
+   - [Supabase](https://supabase.com/)
