@@ -55,7 +55,7 @@ Code Executor provides:
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
    # Docker Configuration
-   # Format: tcp://your-ec2-instance:2376
+   # Format: tcp://your-ec2-instance
    DOCKER_HOST=your_docker_host
 
    # TLS Certificates (base64 encoded)
@@ -92,7 +92,7 @@ Code Executor provides:
 
 2. **Docker Configuration**
    - Set up your EC2 instance following the Docker Setup section below
-   - Your `DOCKER_HOST` should be in the format `tcp://your-ec2-instance:2376`
+   - Your `DOCKER_HOST` should be in the format `tcp://your-ec2-instance`
    - Generate TLS certificates (see Docker Setup section)
    - Base64 encode your certificates:
      ```bash
@@ -208,7 +208,7 @@ async function getData() {
    # Required configuration
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   DOCKER_HOST=tcp://your-ec2-instance:2376
+   DOCKER_HOST=tcp://your-ec2-instance
    VITE_MASTER_PASSWORD=your_master_password
    ```
 
