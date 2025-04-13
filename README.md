@@ -142,20 +142,18 @@ code_executor/
    CREATE TABLE login_creds (
      username TEXT PRIMARY KEY,
      password TEXT NOT NULL,
-     docker_container_id TEXT,
-     created_at TIMESTAMP DEFAULT NOW()
+     docker_container_id TEXT
    );
    ```
 
 2. **code_files**
    ```sql
    CREATE TABLE code_files (
-     id SERIAL PRIMARY KEY,
-     username TEXT REFERENCES login_creds(username),
+     username TEXT NOT NULL,
      file_name TEXT NOT NULL,
      code_content TEXT,
      last_saved TIMESTAMP DEFAULT NOW(),
-     UNIQUE(username, file_name)
+     PRIMARY KEY (username, file_name)
    );
    ```
 
