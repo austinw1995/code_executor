@@ -85,11 +85,10 @@ Code Executor provides:
 ### Environment Configuration Guide
 
 1. **Supabase Setup**
-   - Create a new project at [Supabase](https://supabase.com)
+   - Create a new project at [Supabase](https://supabase.com) following the Supabase Setup section below
    - Go to Project Settings -> API
    - Copy the `Project URL` as `VITE_SUPABASE_URL`
    - Copy the `anon/public` key as `VITE_SUPABASE_ANON_KEY`
-   - See Supabase Setup section
 
 2. **Docker Configuration**
    - Set up your EC2 instance following the Docker Setup section below
