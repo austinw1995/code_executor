@@ -264,7 +264,6 @@ This project uses Supabase as its backend service for user authentication, file 
    - **File Operations**:
      - Automatic file versioning
      - Real-time save and sync
-     - Conflict resolution
      - Access control based on ownership
 
 3. **Supabase Integration**
