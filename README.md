@@ -308,12 +308,7 @@ This project uses Supabase as its backend service for user authentication, file 
      - Persistent file storage
      - Automatic backup
      - Version history
-     - Access control
-   
-   - **Security Measures**:
      - User-based access control
-     - SQL injection prevention
-     - Input validation
 
 ## Deployment
 
