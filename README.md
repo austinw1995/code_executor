@@ -9,7 +9,7 @@ Code Executor provides:
 - 💻 Full-featured terminal with color support
 - 📝 Modern code editor with syntax highlighting
 - 💾 Automatic file saving and version tracking
-- 🔒 Secure, isolated environment for each user
+- 🔒 Secure, isolated environment for each user based on Docker containers hosted on an EC2 instance, one container is assigned to each user with local file storage
 - 📦 Easy package installation (pip and npm supported)
 
 ## Getting Started
