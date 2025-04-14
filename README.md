@@ -664,3 +664,5 @@ This architecture enables a secure, scalable, and efficient code execution envir
    - [XTerm.js](https://xtermjs.org/)
    - [Docker](https://www.docker.com/)
    - [Supabase](https://supabase.com/)
+   - [Dockerode] (https://github.com/apocas/dockerode)
+   - [Amazon-EC2] (https://aws.amazon.com/ec2/)

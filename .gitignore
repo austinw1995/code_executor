@@ -33,3 +33,11 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Security files
+*.pem
+*.key
+*.crt
+*.csr
+*.srl
+certs/
