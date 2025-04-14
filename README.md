@@ -149,24 +149,32 @@ If you encounter any issues, check:
 **Python:**
 ```python
 # Install and use packages
-pip install requests
-import requests
+pip install rich
+# Simple script using the rich library
+from rich import print
+from rich.table import Table
 
-# Your code runs in an isolated environment
-response = requests.get('https://api.example.com/data')
-print(response.json())
+# Create a table
+table = Table(title="Favorite Programming Languages")
+
+table.add_column("Language", style="cyan", no_wrap=True)
+table.add_column("Type", style="magenta")
+table.add_column("Use Case", justify="right", style="green")
+
+# Add rows
+table.add_row("Python", "Interpreted", "AI, Web, Automation")
+table.add_row("Rust", "Compiled", "Systems Programming")
+table.add_row("JavaScript", "Interpreted", "Web Development")
+
+# Print the table
+print(table)
 ```
 
 **JavaScript:**
 ```javascript
-// Install and use npm packages
-npm install axios
-const axios = require('axios');
-
-// Full Node.js environment
-async function getData() {
-    const response = await axios.get('https://api.example.com/data');
-    console.log(response.data);
+//Write your Javascript code here
+for (let i = 0; i < 5; i++) {
+    console.log(i);
 }
 ```
 
@@ -191,31 +199,6 @@ async function getData() {
 - Git
 - AWS EC2 instance for Docker containers
 - Supabase account for data storage
-
-### Setup Instructions
-
-1. **Environment Configuration**
-   ```bash
-   # Clone and setup
-   git clone [your-repo-url]
-   cd code_executor
-   npm install
-   cp .env.example .env
-   ```
-
-2. **Configure Environment Variables**
-   ```env
-   # Required configuration
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   DOCKER_HOST=tcp://your-ec2-instance
-   VITE_MASTER_PASSWORD=your_master_password
-   ```
-
-3. **Start Development Server**
-   ```bash
-   npm run dev
-   ```
 
 ## Technical Details
 

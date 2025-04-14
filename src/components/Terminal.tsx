@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
-import type { Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 import { getContainerIdByUsername, saveCodeFile, getUserFiles, getCodeFile, deleteCodeFile } from '../lib/supabase';
 import Editor from '@monaco-editor/react';
 
@@ -27,9 +27,12 @@ export const Terminal: React.FC<TerminalProps> = ({ username, onLogout }) => {
   const [userFiles, setUserFiles] = useState<UserFile[]>([]);
   const [selectedFileName, setSelectedFileName] = useState<string>('');
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('python');
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<typeof Socket | null>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [currentCommand, setCurrentCommand] = useState<string>('');
 
   // Auto-scroll effect
   useEffect(() => {
@@ -327,6 +330,107 @@ export const Terminal: React.FC<TerminalProps> = ({ username, onLogout }) => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent default behavior for special key combinations
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+    }
+
+    if (e.key === 'Enter') {
+      if (socketRef.current) {
+        // Always send a newline to get a new prompt when Enter is pressed
+        socketRef.current.emit('terminal-input', input + '\n');
+        
+        // Only save to history if the command is not empty
+        if (input.trim()) {
+          if (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== input) {
+            setCommandHistory(prev => [...prev, input]);
+          }
+          setHistoryIndex(-1);
+          setCurrentCommand('');
+        }
+        setInput('');
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (commandHistory.length > 0) {
+        // If we're starting to navigate history, save current input
+        if (historyIndex === -1) {
+          setCurrentCommand(input);
+        }
+        
+        // Calculate new index
+        const newIndex = historyIndex === -1 
+          ? commandHistory.length - 1 
+          : Math.max(0, historyIndex - 1);
+        
+        setHistoryIndex(newIndex);
+        setInput(commandHistory[newIndex]);
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex >= 0) {
+        // Calculate new index
+        const newIndex = historyIndex + 1;
+        
+        if (newIndex >= commandHistory.length) {
+          // Reached the end of history, restore current command
+          setHistoryIndex(-1);
+          setInput(currentCommand);
+        } else {
+          setHistoryIndex(newIndex);
+          setInput(commandHistory[newIndex]);
+        }
+      }
+    } else if (e.key === 'Backspace') {
+      setInput(prev => prev.slice(0, -1));
+    } else if (e.ctrlKey || e.metaKey) {
+      // Handle control sequences
+      switch (e.key.toLowerCase()) {
+        case 'c':
+        case 'd':
+          // Both Ctrl+C and Ctrl+D send SIGINT
+          if (socketRef.current) {
+            socketRef.current.emit('terminal-input', '\x03');
+            setOutput(prev => prev + '^C\n');
+          }
+          // Reset history navigation when interrupting
+          setHistoryIndex(-1);
+          setCurrentCommand('');
+          setInput('');
+          break;
+        case 'l':
+          // Ctrl+L - Clear screen
+          setOutput('');
+          break;
+        case 'v':
+          // Ctrl+V - Paste from clipboard
+          navigator.clipboard.readText().then(text => {
+            setInput(prev => prev + text);
+          });
+          break;
+        case 'u':
+          // Ctrl+U - Clear current line
+          setInput('');
+          // Reset history navigation when clearing line
+          setHistoryIndex(-1);
+          setCurrentCommand('');
+          break;
+        case 'w':
+          // Ctrl+W - Delete last word
+          setInput(prev => prev.replace(/\S+\s*$/, ''));
+          break;
+      }
+    } else if (e.key.length === 1) {
+      setInput(prev => prev + e.key);
+      // Reset history index when typing new characters
+      if (historyIndex !== -1) {
+        setHistoryIndex(-1);
+        setCurrentCommand('');
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow">
@@ -467,18 +571,7 @@ export const Terminal: React.FC<TerminalProps> = ({ username, onLogout }) => {
               ref={terminalRef}
               className="font-mono text-white whitespace-pre-wrap h-[704px] overflow-y-auto focus:outline-none p-5"
               tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  if (socketRef.current) {
-                    socketRef.current.emit('terminal-input', input + '\n');
-                    setInput('');
-                  }
-                } else if (e.key === 'Backspace') {
-                  setInput(prev => prev.slice(0, -1));
-                } else if (e.key.length === 1) {
-                  setInput(prev => prev + e.key);
-                }
-              }}
+              onKeyDown={handleKeyDown}
             >
               {formatAnsiText(output)}
               <span className="inline-block">{input}</span>
