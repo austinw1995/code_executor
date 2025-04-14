@@ -362,42 +362,55 @@ This project uses Supabase as its backend service for user authentication, file 
    sudo chmod 700 /etc/docker/certs
    ```
 
-   Configure systemd service:
-   ```bash
-   sudo systemctl edit docker.service
-   ```
-
-   Add these lines to override the service configuration:
-   ```ini
-   [Service]
-   ExecStart=
-   ExecStart=/usr/bin/dockerd
-   ```
-
    Restart Docker service:
    ```bash
-   sudo systemctl daemon-reload
    sudo systemctl restart docker
    ```
 
-   Verify Docker is running with the new configuration:
-   ```bash
-   sudo docker info
-   sudo netstat -tlpn | grep docker
-   ```
-
 2. **TLS Certificate Generation**
+
+   On your EC2 instance, generate the certificates:
    ```bash
+   # Navigate to the certs directory
+   cd /etc/docker/certs
+
    # Generate CA private key and public certificate
    openssl genrsa -aes256 -out ca-key.pem 4096
    openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem
 
-   # Generate server key and certificate signing request
+   # Generate server key and certificate signing request (replace $HOST with your EC2 public DNS/IP)
    openssl genrsa -out server-key.pem 4096
    openssl req -subj "/CN=$HOST" -sha256 -new -key server-key.pem -out server.csr
 
    # Sign the server CSR
    openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem
+
+   # Generate client certificates
+   openssl genrsa -out key.pem 4096
+   openssl req -subj '/CN=client' -new -key key.pem -out client.csr
+   openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out cert.pem
+
+   # Set proper permissions
+   chmod 0400 ca-key.pem key.pem server-key.pem
+   chmod 0444 ca.pem server-cert.pem cert.pem
+   ```
+
+   Copy certificates to your local machine:
+   ```bash
+   # On your local machine (replace user and host with your EC2 details)
+   mkdir -p ~/.docker/certs
+   scp -i your-ec2-key.pem user@host:/etc/docker/certs/ca.pem ~/.docker/certs/
+   scp -i your-ec2-key.pem user@host:/etc/docker/certs/cert.pem ~/.docker/certs/
+   scp -i your-ec2-key.pem user@host:/etc/docker/certs/key.pem ~/.docker/certs/
+   ```
+
+   Base64 encode certificates for environment variables:
+   ```bash
+   # On your local machine
+   cd ~/.docker/certs
+   base64 -i ca.pem > ca.base64
+   base64 -i cert.pem > cert.base64
+   base64 -i key.pem > key.base64
    ```
 
 3. **Security Group Configuration**
@@ -612,7 +625,7 @@ The decision to host Docker containers on EC2 provides several critical advantag
 1. **Resource Management**
    - Centralized container orchestration
    - Efficient resource allocation
-   - Automated scaling capabilities
+   - Automated scaling capabilities for scalable deployment
    - Consistent environment for all users
 
 2. **Security Benefits**
@@ -637,12 +650,6 @@ The decision to host Docker containers on EC2 provides several critical advantag
    - Resource pooling
    - Efficient container management
    - Quick startup and response times
-
-4. **Cost Efficiency**
-   - Pay-per-use pricing
-   - Resource sharing across users
-   - Optimized infrastructure utilization
-   - Scalable deployment model
 
 This architecture enables a secure, scalable, and efficient code execution environment while maintaining isolation between users and providing a seamless development experience.
 
