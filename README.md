@@ -196,8 +196,6 @@ axios.get('https://icanhazdadjoke.com/', { headers: { Accept: 'application/json'
 - Isolated Docker containers for each user
 - Secure WebSocket connections
 
-## For Administrators
-
 ### System Requirements
 - Node.js v18 or higher
 - Git
