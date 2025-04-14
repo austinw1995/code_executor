@@ -227,104 +227,33 @@ code_executor/
 └── vite.config.ts       # Vite configuration
 ```
 
-### Database Schema
-
-1. **login_creds**
-   ```sql
-   CREATE TABLE login_creds (
-     username TEXT PRIMARY KEY,
-     password TEXT NOT NULL,
-     docker_container_id TEXT
-   );
-   ```
-
-2. **code_files**
-   ```sql
-   CREATE TABLE code_files (
-     username TEXT NOT NULL,
-     file_name TEXT NOT NULL,
-     code_content TEXT,
-     last_saved TIMESTAMP DEFAULT NOW(),
-     PRIMARY KEY (username, file_name)
-   );
-   ```
-
-### WebSocket Communication
-
-The application uses WebSocket connections to enable real-time communication between the client and server, particularly for terminal interactions and container management.
-
-1. **Connection Setup**
-   ```typescript
-   // Frontend WebSocket initialization
-   const socket = io('http://localhost:3000', {
-     reconnectionDelay: 1000,
-     reconnection: true,
-     reconnectionAttempts: 10,
-     transports: ['websocket'],
-     agent: false,
-     upgrade: false,
-     rejectUnauthorized: false
-   });
-
-   // Backend WebSocket handler
-   io.on('connection', (socket) => {
-     // Authentication handler
-     socket.on('authenticate', async (username) => {
-       const container = await getUserContainer(username);
-       setupTerminalConnection(socket, container);
-     });
-
-     // Terminal I/O handlers
-     socket.on('terminal-input', handleTerminalInput);
-     socket.on('terminal-output', handleTerminalOutput);
-     
-     // Container management handlers
-     socket.on('create-container', handleContainerCreation);
-     socket.on('attach-container', handleContainerAttachment);
-     socket.on('remove-container', handleContainerRemoval);
-   });
-   ```
-
-2. **WebSocket Events**
-   - Client Events:
-     - `authenticate`: Authenticate user session
-     - `terminal-input`: Send terminal commands
-     - `list-containers`: Request container list
-     - `create-container`: Create new container
-     - `attach-container`: Connect to container
-     - `rename-container`: Rename container
-     - `remove-container`: Delete container
-
-   - Server Events:
-     - `terminal-output`: Stream command output
-     - `containers-list`: List available containers
-     - `container-created`: Container creation confirmation
-     - `container-renamed`: Container rename confirmation
-     - `container-removed`: Container deletion confirmation
-     - `error`: Error notifications
-
 ### File Management and Database Architecture
 
 This project uses Supabase as its backend service for user authentication, file storage, and container management. Here's how the data is organized and managed:
+
+### Supabase Setup
+
+1. Create new project
+2. Create required tables using provided schema
+3. Disable row level security (RLS)
+4. Generate and save API keys
 
 1. **Database Schema**
    ```sql
    -- User Authentication and Container Management
    CREATE TABLE login_creds (
-     username TEXT PRIMARY KEY,
-     password TEXT NOT NULL,
-     docker_container_id TEXT,
-     created_at TIMESTAMP DEFAULT NOW()
+      username TEXT PRIMARY KEY,
+      password TEXT NOT NULL,
+      docker_container_id TEXT
    );
 
    -- File Storage and Management
    CREATE TABLE code_files (
-     id SERIAL PRIMARY KEY,
-     username TEXT REFERENCES login_creds(username),
-     file_name TEXT NOT NULL,
-     code_content TEXT,
-     last_saved TIMESTAMP DEFAULT NOW(),
-     UNIQUE(username, file_name)
+      username TEXT NOT NULL,
+      file_name TEXT NOT NULL,
+      code_content TEXT,
+      last_saved TIMESTAMP DEFAULT NOW(),
+      PRIMARY KEY (username, file_name)
    );
    ```
 
@@ -482,13 +411,6 @@ This project uses Supabase as its backend service for user authentication, file 
    - Allow port 3000 for WebSocket
    - Allow port 80/443 for HTTP/HTTPS
 
-### Supabase Setup
-
-1. Create new project
-2. Create required tables using provided schema
-3. Disable row level security (RLS)
-4. Generate and save API keys
-
 ## How It Works - Technical Deep Dive
 
 This section provides a comprehensive explanation of the core processes in Code Executor.
@@ -634,6 +556,60 @@ This section provides a comprehensive explanation of the core processes in Code 
    - Language-specific runtime selection
    - Real-time output streaming
    - Error handling and display
+
+### WebSocket Communication
+
+The application uses WebSocket connections to enable real-time communication between the client and server, particularly for terminal interactions and container management.
+
+1. **Connection Setup**
+   ```typescript
+   // Frontend WebSocket initialization
+   const socket = io('http://localhost:3000', {
+     reconnectionDelay: 1000,
+     reconnection: true,
+     reconnectionAttempts: 10,
+     transports: ['websocket'],
+     agent: false,
+     upgrade: false,
+     rejectUnauthorized: false
+   });
+
+   // Backend WebSocket handler
+   io.on('connection', (socket) => {
+     // Authentication handler
+     socket.on('authenticate', async (username) => {
+       const container = await getUserContainer(username);
+       setupTerminalConnection(socket, container);
+     });
+
+     // Terminal I/O handlers
+     socket.on('terminal-input', handleTerminalInput);
+     socket.on('terminal-output', handleTerminalOutput);
+     
+     // Container management handlers
+     socket.on('create-container', handleContainerCreation);
+     socket.on('attach-container', handleContainerAttachment);
+     socket.on('remove-container', handleContainerRemoval);
+   });
+   ```
+
+2. **WebSocket Events**
+   - Client Events:
+     - `authenticate`: Authenticate user session
+     - `terminal-input`: Send terminal commands
+     - `list-containers`: Request container list
+     - `create-container`: Create new container
+     - `attach-container`: Connect to container
+     - `rename-container`: Rename container
+     - `remove-container`: Delete container
+
+   - Server Events:
+     - `terminal-output`: Stream command output
+     - `containers-list`: List available containers
+     - `container-created`: Container creation confirmation
+     - `container-renamed`: Container rename confirmation
+     - `container-removed`: Container deletion confirmation
+     - `error`: Error notifications
 
 ### EC2 Container Architecture
 
