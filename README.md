@@ -414,9 +414,13 @@ This project uses Supabase as its backend service for user authentication, file 
    ```
 
 3. **Security Group Configuration**
-   - Allow port 2376 for Docker TLS
-   - Allow port 3000 for WebSocket
-   - Allow port 80/443 for HTTP/HTTPS
+   - Navigate to AWS Web Dashboard, find your EC2 instance, go to security groups, then edit Inbound Rules
+   - Add the following rules:
+     ```
+     Type        Port    Source              Description
+     SSH         22      0.0.0.0/0          SSH access
+     Custom TCP  2376    0.0.0.0/0          Docker TLS
+     ```
 
 ## How It Works - Technical Deep Dive
 
