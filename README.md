@@ -303,7 +303,6 @@ This project uses Supabase as its backend service for user authentication, file 
      - Create, read, update, delete operations
      - Automatic syntax highlighting
      - File type detection
-     - Real-time collaboration support
    
    - **Storage Features**:
      - Persistent file storage
