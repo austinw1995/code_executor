@@ -172,10 +172,13 @@ print(table)
 
 **JavaScript:**
 ```javascript
+mkdir -p /usr/app (Note: make sure you create a directory to install your npm packages in, as the root directory / in the terminal of your Docker container is not a valid npm project directory)
+cd /usr/app
+npm init -y
+npm install axios
 //Write your Javascript code here
-for (let i = 0; i < 5; i++) {
-    console.log(i);
-}
+const axios = require('axios');
+axios.get('https://icanhazdadjoke.com/', { headers: { Accept: 'application/json' } }).then(res => console.log('😂 Dad Joke:', res.data.joke)).catch(err => console.error('Failed:', err.message));
 ```
 
 ## How It Works
