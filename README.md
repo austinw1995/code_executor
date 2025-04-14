@@ -148,9 +148,9 @@ If you encounter any issues, check:
 
 **Python:**
 ```python
-# Install and use packages
+#In Terminal
 pip install rich
-# Simple script using the rich library
+#In Code Editor
 from rich import print
 from rich.table import Table
 
@@ -172,11 +172,12 @@ print(table)
 
 **JavaScript:**
 ```javascript
+//In Terminal
 mkdir -p /usr/app (Note: make sure you create a directory to install your npm packages in, as the root directory / in the terminal of your Docker container is not a valid npm project directory)
 cd /usr/app
 npm init -y
 npm install axios
-//Write your Javascript code here
+//In Code Editor
 const axios = require('axios');
 axios.get('https://icanhazdadjoke.com/', { headers: { Accept: 'application/json' } }).then(res => console.log('😂 Dad Joke:', res.data.joke)).catch(err => console.error('Failed:', err.message));
 ```
